@@ -1,0 +1,229 @@
+from django.shortcuts import render
+from .models import Estudiante, Proyecto, Grupo, Desafio, DesafiosEstudiantes, Ramo
+#from .models import Proyecto
+
+
+# Create your views here.
+def index(request):
+	return render(request, 'miapp/index.html')
+
+#Proyectos
+
+def added_project(request):
+	return render(request, 'miapp/added_project.html')
+
+def add_proyecto(request):
+	descripcion = request.POST['descripcion']
+	cliente =request.POST['cliente']
+	fecha = request.POST['fecha_limite']
+
+	contexto = {"form":"Formulario creado con exito", "gracias":"Muchas gracias",
+	 "descripcion":descripcion, "cliente":cliente, "fecha":fecha}
+	
+	proyecto = Proyecto(descripcion=descripcion, cliente=cliente, fecha_limite=fecha)
+	proyecto.save()
+	
+	return render(request, 'miapp/added_project.html', contexto)
+
+def lista_proyectos(request):
+	contexto={}
+	contexto['proyectos'] = Proyecto.objects.filter(fecha_limite__year__gt=2018,fecha_limite__month__exact=5)
+	return render(request, 'miapp/lista_proyectos.html', contexto)
+
+def new_project(request):
+	return render(request, 'miapp/new_project.html')
+
+
+def edit_project (request):
+	proyecto = Proyecto.objects.get(id = request.GET['id'])
+
+	contexto = {"id": request.GET['id'],"descr": proyecto.descripcion, "fecha": proyecto.fecha_limite}
+
+	return render(request, 'miapp/edit_project.html', contexto)
+
+
+def upd_project(request):
+
+	fecha = request.POST['fecha_limite']
+
+	proyecto = Proyecto.objects.get(id = request.POST['id'])
+
+	proyecto.fecha_limite = fecha
+	proyecto.save()
+
+	contexto = {"id": request.POST['id'], "fecha": fecha, "form": "Fecha Modificada Correctamente", "gracias": "Muchas gracias"}
+
+	return render(request,'miapp/modified_project.html', contexto)
+
+
+def modified_project(request):
+
+	contexto = {"id": request.GET['id'], "fecha": fecha, "form": "Fecha Modificada Correctamente", "gracias": "Muchas gracias"}
+
+	return render(request, 'miapp/modified_project.html', contexto)
+
+#Grupos
+
+def added_group(request):
+	return render(request, 'miapp/added_group.html')
+
+def new_group(request):
+	contexto = {}
+	contexto = {'proyectos': Proyecto.objects.all()} 
+
+	return render(request, 'miapp/new_group.html', contexto)
+
+def add_group(request): 
+
+	nombre = request.POST['nombreG']
+	proyectoId = request.POST['proyecto']
+
+	proyecto = Proyecto.objects.get(id= proyectoId )
+	
+
+	grupo = Grupo(nombre = nombre, proyecto = proyecto)
+	grupo.save()
+
+	contexto = {"form" : "Grupo Agregado de Manera Exitosa", "nom" : nombre, "proy": proyecto.descripcion}
+
+	return render(request,'miapp/added_group.html', contexto)
+
+
+
+
+        
+#Estudiantes
+
+def lista_estudiantes(request):
+	contexto={}
+	contexto['estudiantes'] = Estudiante.objects.all()
+	return render(request, 'miapp/lista_estudiantes.html',contexto)
+
+
+
+def new_student(request):
+	contexto = {"grupos": Grupo.objects.all(), "id":0 }
+	return render(request,'miapp/new_student.html', contexto)
+
+def add_student(request):
+        
+	nombre = request.POST['nombre']
+	correo = request.POST['correo']
+	numero = request.POST['numero']
+	apodo2 = request.POST['apodo2'] 
+	carrera = request.POST['carrera']
+	grupoId = request.POST['grupo']
+
+	grupo = Grupo.objects.get(id= grupoId)
+
+	estudiante = Estudiante(nombre = nombre, correo = correo, numero = numero, apodo2 = apodo2, grupo = grupo, carrera = carrera)
+	estudiante.save()
+
+	contexto = {"form": "Estudiante añadido de manera exitosa", "gracias": "Muchas gracias",
+	"nom": nombre,"correo":correo, "num": numero, "apod": apodo2, "carrera": carrera, "grupo": grupo.nombre}
+
+	return render(request, 'miapp/added_student.html', contexto)
+
+		
+
+def added_student(request):
+	return render(request, 'miapp/added_student.html')
+
+
+
+def edit_student(request):
+	estudiante = Estudiante.objects.get(id = request.GET['id'])
+	
+	contexto = {"id": request.GET['id'], "nombre" :estudiante.nombre, "correo":estudiante.correo, "num": estudiante.numero, "apod": estudiante.apodo2, "carrera": estudiante.carrera, "grupo": estudiante.grupo.id, "grupos": Grupo.objects.all()}
+
+	return render(request, 'miapp/edit_student.html', contexto)
+
+
+
+def upd_student(request):
+        
+	nombre = request.POST['nombre']
+	correo = request.POST['correo']
+	numero = request.POST['numero']
+	apodo2 = request.POST['apodo2'] 
+	carrera = request.POST['carrera']
+	grupoId = request.POST['grupo']
+
+	grupo = Grupo.objects.get(id= grupoId)
+
+	estudiante = Estudiante.objects.get(id = request.POST['id'])
+	estudiante.nombre = nombre
+	estudiante.correo = correo
+	estudiante.numero = numero
+	estudiante.apodo2 = apodo2
+	estudiante.carrera = carrera
+	estudiante.grupo = grupo
+
+	estudiante.save()
+
+	contexto = {"form": "Modificación Exitosa", "gracias": "Muchas gracias",
+	"nom": nombre,"correo":correo, "num": numero, "apod": apodo2, "carrera": carrera, "grupo": grupo.nombre}
+
+	return render(request, 'miapp/modified_student.html', contexto)
+
+
+
+def modified_student(request):
+
+	contexto = {"form": "Modificación Exitosa", "gracias": "Muchas gracias",
+	"nom": nombre,"correo":correo, "num": numero, "apod": apodo2, "carrera": carrera, "grupo": grupo.nombre}
+
+	return render(request, 'miapp/modified_student.html', contexto)
+
+
+
+def delete_student(request):
+
+	estudiante = Estudiante.objects.get(id = request.GET['id'])
+	estudiante.delete()
+
+	contexto = {"form": "Se ha Eliminado Exitosamente", "gracias": "Muchas gracias",
+	"nom": estudiante.nombre, "carrera": estudiante.carrera, "grupo": estudiante.grupo.nombre}
+	
+	return render(request, 'miapp/deleted_student.html',contexto)
+
+
+
+def deleted_student (request):
+
+	contexto = {"form": "Se ha Eliminado Exitosamente", "gracias": "Muchas gracias",
+	"nom": nombre,"correo":correo, "num": numero, "apod": apodo2, "carrera": carrera, "grupo": grupo.nombre}
+
+	return render(request, 'miapp/deleted_student.html', contexto)
+
+
+
+#Ramos
+
+def added_ramo(request):
+	return render(request, 'miapp/added_ramo.html')
+
+def add_ramo(request):
+	nombre = request.POST['nombre']
+	departamento =request.POST['departamento']
+	uds = request.POST['uds']
+
+	contexto = {"form":"Formulario creado con exito", "gracias":"Muchas gracias"}
+	
+	proyecto = Ramo(nombre_ramo=nombre, departamento=departamento, uds=uds)
+	proyecto.save()
+	
+	return render(request, 'miapp/added_ramo.html', contexto)
+
+def new_ramo(request):
+	return render(request, 'miapp/new_ramo.html')
+
+def modificar_ramo(request):
+	a_modificar = request.POST['nombre_antes']
+	nuevo_nombre = request.POST['nombre_nuevo']
+	registro= Ramo.objects.get(nombre_ramo=a_modificar)
+	registro.nombre_ramo=nuevo_nombre
+	registro.save()
+	return render(request, 'miapp/added_ramo.html')
+
+

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Productos</title>
+
+    <!-- favicon -->
+    <link rel="shortcut icon" href="{%  static 'favicon.ico' %}">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+
+    <!-- Custom fonts for this template -->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <link href="{% static 'css/freelancer.min.css' %}" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    {% include 'miapp/menu.html' %}
+
+    <!-- Header -->
+    <header class="masthead bg-primary text-white text-center">
+        <div class="container">
+            <h1 class="text-uppercase mb-0">Lista de Productos</h1>
+        </div>
+    </header>
+
+    <!-- Lista de Usuarios -->
+    <section id="lista_productos">
+        <div class="container">
+            <hr class="star-dark mb-5">
+            <div class="row">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Disponibilidad</th>
+                            <th scope="col">Carrito</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for value in productos %}
+                        <tr>
+                            <td>{{value.nombre}}</td>
+                            <td>{{value.descripcion}}</td>
+                            <td>{{value.precio}}</td>
+                            <td>{{value.disponibilidad}}</td>
+							<td><a href='/add_to_cart?id={{value.id}}'>Añadir al carrito</a></td>
+							</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    {% include 'miapp/footer.html' %}
+
+</body>
